@@ -3,22 +3,7 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 
 apply plugin: 'kotlin-android-extensions'
-apply plugin: 'konan'
-konanInterop {
-    kotliner {
-        defFile 'kotliner.def' // interop 的配置文件
-        includeDirs "src/main/cpp/include" // C 头文件目录，可以传入多个
-        //pkg "cn.kotliner.native" // C 头文件编译后映射为 Kotlin 的包名，这个有问题，后面我们再说
-    }
-}
-konanArtifacts {
-    Kotliner {
-        inputFiles fileTree("src/main/java") //kotlin 代码配置，项目入口 main 需要定义在这里
-        useInterop 'kotliner' //使用前面的 interop 配置
-        nativeLibrary file('src/c/cn_kotliner.bc') //自己编译的 llvm 字节格式的依赖
-        target 'arm' // 编译的目标平台
-    }
-}
+
 android {
     compileSdkVersion 26
     buildToolsVersion "26.0.1"
@@ -29,6 +14,9 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        ndk {
+            abiFilters "armeabi"
+        }
         externalNativeBuild {
             cmake {
                 cppFlags ""

@@ -8,7 +8,7 @@ import android.view.SurfaceView
 /**
  * Created by carljay on 17-9-3.
  */
-class VideoPlayer (context: Context,attrs: AttributeSet?): SurfaceView(context),SurfaceHolder.Callback {
+class VideoPlayer (context: Context,attrs: AttributeSet?): SurfaceView(context,attrs,0),SurfaceHolder.Callback {
 
     override fun surfaceChanged(p0: SurfaceHolder?, p1: Int, p2: Int, p3: Int) {
 
@@ -27,7 +27,7 @@ class VideoPlayer (context: Context,attrs: AttributeSet?): SurfaceView(context),
     }
 
     fun play() {
-        ffmpeg_object.start()
+        ffmpeg_object.start(0)
     }
 }
 

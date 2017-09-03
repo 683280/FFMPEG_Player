@@ -4,13 +4,20 @@
 
 #include <jni.h>
 #include "ffmpeg_object.h"
+#include <libavformat/avformat.h>
 #define JNIREG_CLASS "com/carljay/ffmpeg_project/ffmpeg/FFmpegObject"//指定要注册的类
 
 static JNINativeMethod gMethods[] = {
-        { "_start", "(I)Ljava/lang/Int;", (void*) start},
-//        { "_setPath", "(S)Ljava/lang/Int;", (void*) setPath},
+        { "_start", "(I)I", (void*) start},
+        { "_setPath", "(Ljava/lang/String;)I", (void*) setPath},
 };
+int init_ffmpeg(){
+    av_register_all();
+    avformat_network_init();
+}
+FFmpeg_Object* getFFmpeg_object(jobject jobject1){
 
+}
 static int registerNativeMethods(JNIEnv* env, const char* className,
                                  JNINativeMethod* gMethods, int numMethods)
 {
@@ -44,8 +51,8 @@ JNIEXPORT jint JNI_OnLoad(JavaVM* vm, void* reserved){
         return -1;
     }
     /* success -- return valid version number */
-    result = JNI_VERSION_1_4;
-
+    result = JNI_VERSION_1_6;
+    init_ffmpeg();
     return result;
 }
 JNIEXPORT void JNI_OnUnload(JavaVM* vm, void* reserved){

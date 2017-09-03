@@ -7,7 +7,8 @@ import android.view.Surface
  */
 class FFmpegObject{
     var jni_object:Long = 0
-    external fun _start(i:java.lang.Integer):java.lang.Integer
+    external fun _start(i:Int):Int
+    external fun _setPath(path:String):Int
 //    external fun _pause()
     fun setSurface(window : Surface){
 
@@ -17,8 +18,16 @@ class FFmpegObject{
             System.loadLibrary("ffmpeg_jni-lib")
         }
     }
+    fun setPath(){
 
-    fun start() {
-        Log.e("TAG", "start = ${_start(Integer(0)) }")
+    }
+    fun start(i :Int) {
+        Thread{
+            _setPath("http://baobab.wdjcdn.com/14564977406580.mp4")
+            Log.e("TAG", "jni_object = $jni_object")
+            Log.e("TAG", "start = ${_start((0)) }")
+            Log.e("TAG", "jni_object = $jni_object")
+        }.start()
+
     }
 }
