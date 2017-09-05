@@ -18,7 +18,7 @@ class VideoPlayer (context: Context,attrs: AttributeSet?): SurfaceView(context,a
     }
 
     override fun surfaceCreated(p0: SurfaceHolder?) {
-        ffmpeg_object.setSurface(holder.surface)
+        ffmpeg_object.setSurface(holder.surface,width,height)
     }
 
     var ffmpeg_object = FFmpegObject()

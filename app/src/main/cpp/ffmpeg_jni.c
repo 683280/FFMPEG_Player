@@ -8,15 +8,13 @@
 #define JNIREG_CLASS "com/carljay/ffmpeg_project/ffmpeg/FFmpegObject"//指定要注册的类
 
 static JNINativeMethod gMethods[] = {
-        { "_start", "(I)I", (void*) start},
+        { "_start", "()I", (void*) start},
         { "_setPath", "(Ljava/lang/String;)I", (void*) setPath},
+        { "_setSurface", "(Ljava/lang/Object;II)I", (void*) setSurface},
 };
 int init_ffmpeg(){
     av_register_all();
     avformat_network_init();
-}
-FFmpeg_Object* getFFmpeg_object(jobject jobject1){
-
 }
 static int registerNativeMethods(JNIEnv* env, const char* className,
                                  JNINativeMethod* gMethods, int numMethods)
