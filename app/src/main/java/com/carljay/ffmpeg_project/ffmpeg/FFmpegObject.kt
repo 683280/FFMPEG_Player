@@ -11,6 +11,7 @@ class FFmpegObject{
     var jni_object:Long = 0
     external fun _start():Int
     external fun _setPath(path:String):Int
+    external fun _load():Int
     external fun _setSurface(surface:Any,width:Int,height :Int):Int
 //    external fun _pause()
     fun setSurface(window : Surface,width:Int,height:Int){
@@ -25,13 +26,13 @@ class FFmpegObject{
 
     }
     fun start(i :Int) {
+        _setPath("http://baobab.wdjcdn.com/14564977406580.mp4")
         Thread{
-            _setPath("http://baobab.wdjcdn.com/14564977406580.mp4")
+            _load()
+        }.start()
+        Thread{
             Log.e("TAG", "jni_object = $jni_object")
             Log.e("TAG", "start = ${_start() }")
-            Log.e("TAG", "jni_object = $jni_object")
-
         }.start()
-
     }
 }

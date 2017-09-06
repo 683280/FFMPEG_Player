@@ -40,6 +40,7 @@ int postFrame(FFmpeg_Object* object) {
 
 int initSurfaceNative(FFmpeg_Object* object) {
     SurfaceNative* surfaceNative = object->pSurfaceNative;
+    object->pVideoQueue = calloc(sizeof(Queue),1);
     int ret = ANativeWindow_setBuffersGeometry(surfaceNative->pWindow, surfaceNative->width, surfaceNative->height, WINDOW_FORMAT_RGBA_8888);
     init_video_sws(object);
     return ret;

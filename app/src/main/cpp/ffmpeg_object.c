@@ -8,6 +8,9 @@
 #include <libavutil/imgutils.h>
 #include <head.h>
 #include <libswscale/swscale.h>
+#include <opensl_es.h>
+#include <queue.h>
+#include <pthread.h>
 
 #define ffmpeg_object FFmpeg_Object* object = getFFmpegObject(env,obj);
 FFmpeg_Object *getFFmpegObject(JNIEnv *env, jobject jobject1) {
@@ -96,16 +99,55 @@ static int decode_packet(FFmpeg_Object *object, AVPacket *pPacket) {
 
     }else if (pPacket->stream_index == object->audio_stream_idx) {
 
+
     }
     return decoded;
 }
-
+void get_audio_data(FFmpeg_Object* object){
+    int ret;
+    AVPacket* pPacket;
+    reload:
+    pPacket = get_packet(object->pAudioQueue);
+    if ((ret = avcodec_send_packet(object->pAudioCodecCtx, pPacket)) != 0) {
+        LOGE("avcodec_send_packet error = %d", ret);
+        goto reload;
+    }
+    do {
+        ret = avcodec_receive_frame(object->pAudioCodecCtx, object->pAudioFrame);
+        if (ret < 0) {
+            av_frame_unref(object->pAudioFrame);
+            return ;
+        }
+        post_audio_data(object);
+        av_frame_unref(object->pAudioFrame);
+        av_packet_unref(pPacket);
+    }while(1);
+}
 int start(JNIEnv *env,jobject *obj) {
     ffmpeg_object
-    int result;
-    if((result = load(env,obj)) < 0){
-        return result;
+    while (object->state == OBJECT_STATE_UNINIT){
+
     }
+    //播放声言
+    play(object->openSLES);
+//    get_audio_data(object);
+    while (1){
+        AVPacket* pkt = get_packet(object->pVideoQueue);
+        int ret = decode_packet(object, pkt);
+        av_packet_unref(pkt);
+        if(ret == 0){
+            continue;
+        }else if (ret == AVERROR(EAGAIN)){//数据太少不能解出一帧，重新读取
+            continue;
+        } else if(ret == AVERROR(EINVAL)){//不支持数据，错误，退出
+//            av_packet_unref(pkt);
+            return -1;
+        }
+
+    }
+//    if((result = load(env,obj)) < 0){
+//        return result;
+//    }
     return 0;
 }
 
@@ -124,7 +166,7 @@ int stop(JNIEnv *env,jobject *obj) {
     return 0;
 }
 
-int load(JNIEnv *env,jobject *obj) {
+int load(JNI_PARAMETER) {
     ffmpeg_object
     if(object->path == NULL){
         return -1;
@@ -136,35 +178,34 @@ int load(JNIEnv *env,jobject *obj) {
         return -2;
     }
     if(open_codec_context(&object->video_stream_idx,&object->pVideoCodecCtx,object->pFormatCtx,AVMEDIA_TYPE_VIDEO) == 0){
-//        object->pSurfaceNative->width = object->pVideoCodecCtx->width;
-//        object->pSurfaceNative->height = object->pVideoCodecCtx->height;
         initSurfaceNative(object);
+        object->pVideoQueue->max = 30;
         object->pVideoFrame = av_frame_alloc();
-//        LOGD("没有视频数据");
     }
-    if(open_codec_context(&object->audio_stream_idx,&object->pAudioCodecCtx,object->pFormatCtx,AVMEDIA_TYPE_AUDIO) != 0){
-        LOGD("没有音频数据");
+    if(open_codec_context(&object->audio_stream_idx,&object->pAudioCodecCtx,object->pFormatCtx,AVMEDIA_TYPE_AUDIO) == 0){
         object->pAudioFrame = av_frame_alloc();
+        initOpenslPlayer(object);
+        object->pAudioQueue->max = 40;
+        object->get_audio_data = get_audio_data;
     }
     if (object->audio_stream_idx == -1 && object->video_stream_idx == -1){
         return -4;
     }
+    object->state = OBJECT_STATE_INIT;
     LOGD("width = %d",object->pVideoCodecCtx->width);
     LOGD("height = %d",object->pVideoCodecCtx->height);
     AVPacket pkt;
     av_init_packet(&pkt);
     while (av_read_frame(object->pFormatCtx, &pkt) >= 0) {
-        int ret = decode_packet(object, &pkt);
-        if(ret == 0){
-            continue;
-        }else if (ret == AVERROR(EAGAIN)){//数据太少不能解出一帧，重新读取
-            continue;
-        } else if(ret == AVERROR(EINVAL)){//不支持数据，错误，退出
-            av_packet_unref(&pkt);
-            return -1;
+        AVPacket* p = av_packet_clone(&pkt);
+        if (pkt.stream_index == object->audio_stream_idx) {
+//            post_packet(object->pAudioQueue,p);
+        } else if(pkt.stream_index == object->video_stream_idx){
+            post_packet(object->pVideoQueue,p);
         }
+
     }
-    av_free(&pkt);
+//    av_free(&pkt);
     LOGE("play end");
     return 0;
 }

@@ -5,13 +5,20 @@
 #include <jni.h>
 #include "ffmpeg_object.h"
 #include <libavformat/avformat.h>
-#define JNIREG_CLASS "com/carljay/ffmpeg_project/ffmpeg/FFmpegObject"//指定要注册的类
+#include <opensl_es.h>
+#include <pthread.h>
 
+#define JNIREG_CLASS "com/carljay/ffmpeg_project/ffmpeg/FFmpegObject"//指定要注册的类
 static JNINativeMethod gMethods[] = {
         { "_start", "()I", (void*) start},
         { "_setPath", "(Ljava/lang/String;)I", (void*) setPath},
         { "_setSurface", "(Ljava/lang/Object;II)I", (void*) setSurface},
+        { "_load", "()I", (void*) load},
 };
+
+void _start(JNIEnv *env,jobject *obj){
+
+}
 int init_ffmpeg(){
     av_register_all();
     avformat_network_init();
@@ -51,6 +58,7 @@ JNIEXPORT jint JNI_OnLoad(JavaVM* vm, void* reserved){
     /* success -- return valid version number */
     result = JNI_VERSION_1_6;
     init_ffmpeg();
+    initOpenSlEngine();
     return result;
 }
 JNIEXPORT void JNI_OnUnload(JavaVM* vm, void* reserved){
