@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.SurfaceHolder
 import android.view.SurfaceView
+import com.carljay.ffmpeg_project.MediaPlayer
 
 /**
  * Created by carljay on 17-9-3.
@@ -21,13 +22,15 @@ class VideoPlayer (context: Context,attrs: AttributeSet?): SurfaceView(context,a
         ffmpeg_object.setSurface(holder.surface,width,height)
     }
 
-    var ffmpeg_object = FFmpegObject()
+    var ffmpeg_object = MediaPlayer()
     init {
         holder.addCallback(this)
     }
 
     fun play() {
-        ffmpeg_object.start(0)
+        ffmpeg_object.setPath( "http://192.168.100.104/1.flv")
+        ffmpeg_object.load()
+        ffmpeg_object.start()
     }
 }
 

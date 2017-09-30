@@ -13,32 +13,36 @@
 #include <libswresample/swresample.h>
 #define OBJECT_STATE_UNINIT 0
 #define OBJECT_STATE_INIT 1
-typedef struct QueueNode_{
-    struct QueueNode_* next;
-    AVPacket* packet;
-}QueueNode;
-typedef struct {
-    QueueNode* first,*last;
-    int max;
-    int curr;
+#define OBJECT_STATE_PLAYING 2
+#define OBJECT_STATE_RECORDING 3
+#define OBJECT_STATE_END 4
+//#define OBJECT_STATE_ 2
 
-}Queue;
 typedef struct {
     ANativeWindow* pWindow;
     int height,width;//Surface宽高
     ANativeWindow_Buffer windowBuffer;
     struct SwsContext* pVideoSwsCtx;
     AVFrame* pSwsFrame;//转换之后的一帧
+    Queue* pQueue;
 }SurfaceNative;
 typedef struct {
+
     SwrContext* pSwrCtx;
+    //opensl player结构体
     SLPlayItf sl_player_itf;
-    SLAndroidSimpleBufferQueueItf sl_queue_itf;
+    SLAndroidSimpleBufferQueueItf sl_player_queue_itf;
     SLAndroidEffectItf sl_effect_itf;
     SLVolumeItf sl_volume_itf;
-    void* sl_buffer;
+    uint8_t * sl_buffer;
     int sl_buffer_size;
-
+    //opensl record结构体
+    SLRecordItf sl_record_itf;
+    SLAndroidSimpleBufferQueueItf sl_record_queue_itf;
+    //
+    int data_size;
+    int(*get_pcm)(void* context);
+    int(*save_pcm)(void* context);
 }OpenSLES;
 typedef struct {
     char* path;
@@ -47,7 +51,7 @@ typedef struct {
     AVFrame* pVideoFrame,*pAudioFrame;
     AVCodecContext* pVideoCodecCtx,*pAudioCodecCtx;
     SurfaceNative*pSurfaceNative;
-    OpenSLES* openSLES;
+    OpenSLES* pOpenSLES;
     Queue* pAudioQueue,*pVideoQueue;
     void(*get_audio_data)(void* context);
 }FFmpeg_Object;

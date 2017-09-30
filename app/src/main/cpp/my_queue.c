@@ -2,13 +2,12 @@
 // Created by carljay on 17-9-6.
 //
 
-#include <head.h>
-#include <queue.h>
+#include <my_queue.h>
 #include <Log.h>
+#include <malloc.h>
 
-int post_packet(Queue* queue,AVPacket *packet) {
+int post_packet(Queue* queue,void *packet) {
     while (queue->curr == queue->max){
-//        LOGE("post_packet = max");
     }
     QueueNode* node = calloc(sizeof(QueueNode),1);
     node->packet = packet;
@@ -23,13 +22,14 @@ int post_packet(Queue* queue,AVPacket *packet) {
     return 0;
 }
 
-AVPacket *get_packet(Queue* queue) {
+void *get_packet(Queue* queue) {
     while (queue->first == 0){
-
-//        LOGE("get_packet = 0 max = %d",queue->max);
     }
-    queue->curr--;
+    void * pkt;
     QueueNode* node = queue->first;
     queue->first = node->next;
-    return node->packet;
+    pkt = node->packet;
+    queue->curr--;
+    free(node);
+    return pkt;
 }

@@ -17,16 +17,11 @@ class FFmpegObject{
     fun setSurface(window : Surface,width:Int,height:Int){
         _setSurface(window,width,height)
     }
-    companion object {
-        init {
-            System.loadLibrary("ffmpeg_jni-lib")
-        }
-    }
     fun setPath(){
 
     }
     fun start(i :Int) {
-        _setPath("http://baobab.wdjcdn.com/14564977406580.mp4")
+        _setPath("http://192.168.100.104/1.flv")
         Thread{
             _load()
         }.start()

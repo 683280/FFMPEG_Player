@@ -11,5 +11,6 @@
 #include "head.h"
 int init_video_sws(FFmpeg_Object* object);
 int postFrame(FFmpeg_Object* object);
+int play_video(FFmpeg_Object* object);
 int initSurfaceNative(FFmpeg_Object* object);
 #endif //FFMPEG_PLAYER_SURFACENATIVE_H

@@ -3,21 +3,44 @@ set(lib_src_DIR ${CMAKE_SOURCE_DIR}/src/main/jniLibs/armeabi)
 include_directories(src/main/cpp/include)
 
 #My C
+#add_library( ffmpeg_jni-lib
+#             SHARED
+#             src/main/cpp/ffmpeg_jni.c )
+#add_library( ffmpeg_object-lib
+#             SHARED
+#             src/main/cpp/ffmpeg_object.c )
+#add_library( surface_native-lib
+#             SHARED
+#             src/main/cpp/surface_native.c )
+#add_library( opensl_es-lib
+#             SHARED
+#             src/main/cpp/opensl_native.c )
+#add_library( queue-lib
+#             SHARED
+#             src/main/cpp/queue.c )
+#add_library( codec-lib
+#             SHARED
+#             src/main/cpp/codec.c )
+#---------------------------C++------------------
 add_library( ffmpeg_jni-lib
              SHARED
-             src/main/cpp/ffmpeg_jni.c )
-add_library( ffmpeg_object-lib
+             src/main/cpp/ffmpeg_jni.cpp )
+add_library( media_player-lib
              SHARED
-             src/main/cpp/ffmpeg_object.c )
-add_library( surface_native-lib
+             src/main/cpp/player/media_player.cpp )
+add_library( video_object-lib
              SHARED
-             src/main/cpp/surface_native.c )
-add_library( opensl_es-lib
+             src/main/cpp/player/video_object.cpp )
+
+add_library( audio_object-lib
              SHARED
-             src/main/cpp/opensl_es.c )
+             src/main/cpp/player/audio_object.cpp )
 add_library( queue-lib
              SHARED
-             src/main/cpp/queue.c )
+             src/main/cpp/my_queue.c )
+add_library( ffmpeg_object-lib
+             SHARED
+             src/main/cpp/player/ffmpeg_object.cpp )
 
 find_library( # Sets the name of the path variable.
               log-lib
@@ -41,27 +64,59 @@ set_target_properties(avswresample_lib PROPERTIES IMPORTED_LOCATION
                         ${lib_src_DIR}/libswresample-2.so)
 
 target_link_libraries( ffmpeg_jni-lib
-                       ffmpeg_object-lib)
+                       media_player-lib)
 
-target_link_libraries( ffmpeg_object-lib
-                       surface_native-lib
-                       opensl_es-lib
+target_link_libraries( media_player-lib
+                       video_object-lib
+                       ffmpeg_object-lib
+                       audio_object-lib)
+
+target_link_libraries( video_object-lib
+                       android
                        queue-lib
-                       avformat_lib
-                       avutil_lib
-                       avcodec_lib
                        ${log-lib} )
-target_link_libraries( surface_native-lib
-                       android
-                       avutil_lib
-                       avswscale_lib
-                       ${log-lib} )
-target_link_libraries( opensl_es-lib
-                       android
+
+target_link_libraries( audio_object-lib
+                       OpenSLES
                        avswresample_lib
                        avutil_lib
-                       OpenSLES
-                       avswscale_lib
+                       queue-lib
+                       android
                        ${log-lib} )
-target_link_libraries( queue-lib
+
+target_link_libraries( ffmpeg_object-lib
+                       avutil_lib
+                       avformat_lib
+                       queue-lib
+                       avcodec_lib
                        ${log-lib} )
+
+#-----------------------------------------------------C------------
+#target_link_libraries( ffmpeg_object-lib
+#                       surface_native-lib
+#                       codec-lib
+#                       opensl_es-lib
+#                       queue-lib
+#                       avformat_lib
+#                       avutil_lib
+#                       avcodec_lib
+#                       ${log-lib} )
+#target_link_libraries( surface_native-lib
+#                       android
+#                       queue-lib
+#                       avutil_lib
+#                       avswscale_lib
+#                       ${log-lib} )
+#target_link_libraries( opensl_es-lib
+#                       android
+#                       avswresample_lib
+#                       avutil_lib
+#                       OpenSLES
+#                       avswscale_lib
+#                       ${log-lib} )
+#target_link_libraries( queue-lib
+#                       ${log-lib} )
+#target_link_libraries( codec-lib
+#                      avcodec_lib
+#                      queue-lib
+#                      ${log-lib} )

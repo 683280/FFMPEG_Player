@@ -10,8 +10,9 @@
 #include <libavutil/avutil.h>
 #include "surface_native.h"
 #include "head.h"
+#include <codec.h>
 
-FFmpeg_Object* getFFmpegObject(JNIEnv*env,jobject jobject1);
+//FFmpeg_Object* getFFmpegObject(JNIEnv*env,jobject jobject1);
 int findFFmpegStream();
 int setSurface(JNI_PARAMETER,jobject* surface,int width,int height);
 int initFFmpegObject(FFmpeg_Object* object);
@@ -21,4 +22,7 @@ int seek(JNI_PARAMETER,int i);
 int pause(JNI_PARAMETER);
 int stop(JNI_PARAMETER);
 int load(JNI_PARAMETER);
+void t_load(FFmpeg_Object* object);
+void t_decodec_video(FFmpeg_Object* object);
+void t_decodec_audio(FFmpeg_Object* object);
 #endif //FFMPEG_PROJECT_FFMPEG_OBJECT_H
